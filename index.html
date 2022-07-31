@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V.S. Earth Date</title>
+
+    <style>
+        body {
+            text-align: center;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="date"></h1>
+    <h2 id="time"></h2>
+    <script type="text/javascript">
+        const startTime = 1659135600000;
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        let date = document.getElementById("date");
+        let time = document.getElementById("time");
+
+        function getCurrentDate() {
+            let gameTime = Date.now() - startTime;
+            let days = Math.floor(gameTime / 1200000);
+            return days;
+        }
+
+        function getCurrentTime() {
+            let gameTime = Date.now() - startTime;
+            let currentTime = gameTime % 1200000;
+            let timeOfDay = "AM";
+
+            currentHour = Math.floor(currentTime / 50000);
+            currentMinute = Math.floor((currentTime - (currentHour * 50000)) / (50000 / 60));
+
+            if (currentHour >= 12) {
+                currentHour -= 12;
+                timeOfDay = "PM";
+            }
+            if (currentHour == 0) {
+                currentHour = 12;
+            }
+
+            return currentHour + ":" + currentMinute.toString().padStart(2, '0') + " " + timeOfDay;
+        }
+
+        function updateTime() {
+            let day = addDays(getCurrentDate());
+
+            date.innerHTML = monthNames[day.month - 1] + " " + ordinalSuffix(day.day) + ", Year " + day.year;
+            time.innerHTML = getCurrentTime();
+        }
+
+        function ordinalSuffix(i) {
+            var j = i % 10,
+                k = i % 100;
+            if (j == 1 && k != 11) {
+                return i + "st";
+            }
+            if (j == 2 && k != 12) {
+                return i + "nd";
+            }
+            if (j == 3 && k != 13) {
+                return i + "rd";
+            }
+            return i + "th";
+        }
+
+        function isLeapYear(year) {
+            if (year % 100 != 0 && year % 4 == 0 || year % 400 == 0)
+                return true;
+            return false;
+        }
+
+        function offset(offset, y) {
+            var month = [0, 31, 28, 31, 30, 31, 30,
+                31, 31, 30, 31, 30, 31];
+
+            if (isLeapYear(y))
+                month[2] = 29;
+
+            var i;
+            for (i = 1; i <= 12; i++) {
+                if (offset <= month[i])
+                    break;
+
+                offset = offset - month[i];
+            }
+            d2 = offset;
+            m2 = i;
+        }
+
+        function addDays(days) {
+            var offset1 = 0
+            var d1 = 1, m1 = 1, y1 = 1;
+            var remDays = isLeapYear(y1) ? (366 - offset1) : (365 - offset1);
+
+            var y2, offset2 = 0;
+            if (days <= remDays) {
+                y2 = y1;
+                offset2 = offset1 + days;
+            } else {
+
+                days -= remDays;
+                y2 = y1 + 1;
+                var y2days = isLeapYear(y2) ? 366 : 365;
+
+                while (days >= y2days) {
+                    days -= y2days;
+                    y2++;
+                    y2days = isLeapYear(y2) ? 366 : 365;
+                }
+                offset2 = days;
+            }
+
+            offset(offset2, y2);
+            return { day: d2, month: m2, year: y2 };
+        }
+
+        setInterval(updateTime, 50);
+
+    </script>
+</body>
+
+</html>
